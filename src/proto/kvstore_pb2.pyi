@@ -83,3 +83,19 @@ class SyncResponse(_message.Message):
     ENTRIES_FIELD_NUMBER: _ClassVar[int]
     entries: _containers.RepeatedCompositeFieldContainer[SyncEntry]
     def __init__(self, entries: _Optional[_Iterable[_Union[SyncEntry, _Mapping]]] = ...) -> None: ...
+
+class HeartbeatRequest(_message.Message):
+    __slots__ = ("term_id", "commit_id", "leader_port")
+    TERM_ID_FIELD_NUMBER: _ClassVar[int]
+    COMMIT_ID_FIELD_NUMBER: _ClassVar[int]
+    LEADER_PORT_FIELD_NUMBER: _ClassVar[int]
+    term_id: int
+    commit_id: int
+    leader_port: int
+    def __init__(self, term_id: _Optional[int] = ..., commit_id: _Optional[int] = ..., leader_port: _Optional[int] = ...) -> None: ...
+
+class HeartbeatResponse(_message.Message):
+    __slots__ = ("success",)
+    SUCCESS_FIELD_NUMBER: _ClassVar[int]
+    success: bool
+    def __init__(self, success: _Optional[bool] = ...) -> None: ...

@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rkvstore.proto\x12\x07kvstore\"L\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\tcommit_id\x18\x03 \x01(\x03\x12\x0f\n\x07term_id\x18\x04 \x01(\x03\"/\n\x0bPutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x19\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"+\n\x0bGetResponse\x12\r\n\x05\x66ound\x18\x01 \x01(\x08\x12\r\n\x05value\x18\x02 \x01(\t\"@\n\rDeleteRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x11\n\tcommit_id\x18\x02 \x01(\x03\x12\x0f\n\x07term_id\x18\x03 \x01(\x03\"2\n\x0e\x44\x65leteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"%\n\x0bSyncRequest\x12\x16\n\x0e\x66rom_commit_id\x18\x01 \x01(\x03\"W\n\tSyncEntry\x12\n\n\x02op\x18\x01 \x01(\t\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\x12\x11\n\tcommit_id\x18\x04 \x01(\x03\x12\x0f\n\x07term_id\x18\x05 \x01(\x03\"3\n\x0cSyncResponse\x12#\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x12.kvstore.SyncEntry2\xef\x01\n\rKeyValueStore\x12\x32\n\x03Put\x12\x13.kvstore.PutRequest\x1a\x14.kvstore.PutResponse\"\x00\x12\x32\n\x03Get\x12\x13.kvstore.GetRequest\x1a\x14.kvstore.GetResponse\"\x00\x12;\n\x06\x44\x65lete\x12\x16.kvstore.DeleteRequest\x1a\x17.kvstore.DeleteResponse\"\x00\x12\x39\n\x08SyncLogs\x12\x14.kvstore.SyncRequest\x1a\x15.kvstore.SyncResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rkvstore.proto\x12\x07kvstore\"L\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\tcommit_id\x18\x03 \x01(\x03\x12\x0f\n\x07term_id\x18\x04 \x01(\x03\"/\n\x0bPutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x19\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"+\n\x0bGetResponse\x12\r\n\x05\x66ound\x18\x01 \x01(\x08\x12\r\n\x05value\x18\x02 \x01(\t\"@\n\rDeleteRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x11\n\tcommit_id\x18\x02 \x01(\x03\x12\x0f\n\x07term_id\x18\x03 \x01(\x03\"2\n\x0e\x44\x65leteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"%\n\x0bSyncRequest\x12\x16\n\x0e\x66rom_commit_id\x18\x01 \x01(\x03\"W\n\tSyncEntry\x12\n\n\x02op\x18\x01 \x01(\t\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\x12\x11\n\tcommit_id\x18\x04 \x01(\x03\x12\x0f\n\x07term_id\x18\x05 \x01(\x03\"3\n\x0cSyncResponse\x12#\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x12.kvstore.SyncEntry\"K\n\x10HeartbeatRequest\x12\x0f\n\x07term_id\x18\x01 \x01(\x03\x12\x11\n\tcommit_id\x18\x02 \x01(\x03\x12\x13\n\x0bleader_port\x18\x03 \x01(\x05\"$\n\x11HeartbeatResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x32\xb5\x02\n\rKeyValueStore\x12\x32\n\x03Put\x12\x13.kvstore.PutRequest\x1a\x14.kvstore.PutResponse\"\x00\x12\x32\n\x03Get\x12\x13.kvstore.GetRequest\x1a\x14.kvstore.GetResponse\"\x00\x12;\n\x06\x44\x65lete\x12\x16.kvstore.DeleteRequest\x1a\x17.kvstore.DeleteResponse\"\x00\x12\x39\n\x08SyncLogs\x12\x14.kvstore.SyncRequest\x1a\x15.kvstore.SyncResponse\"\x00\x12\x44\n\tHeartbeat\x12\x19.kvstore.HeartbeatRequest\x1a\x1a.kvstore.HeartbeatResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -49,6 +49,10 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_SYNCENTRY']._serialized_end=469
   _globals['_SYNCRESPONSE']._serialized_start=471
   _globals['_SYNCRESPONSE']._serialized_end=522
-  _globals['_KEYVALUESTORE']._serialized_start=525
-  _globals['_KEYVALUESTORE']._serialized_end=764
+  _globals['_HEARTBEATREQUEST']._serialized_start=524
+  _globals['_HEARTBEATREQUEST']._serialized_end=599
+  _globals['_HEARTBEATRESPONSE']._serialized_start=601
+  _globals['_HEARTBEATRESPONSE']._serialized_end=637
+  _globals['_KEYVALUESTORE']._serialized_start=640
+  _globals['_KEYVALUESTORE']._serialized_end=949
 # @@protoc_insertion_point(module_scope)

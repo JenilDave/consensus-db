@@ -80,6 +80,31 @@ class KeyValueStoreServicer(kvstore_pb2_grpc.KeyValueStoreServicer):
     def __init__(self, storage: DurableStorage, config_manager: ConfigManager):
         self.storage = storage
         self.config_manager = config_manager
+        self.heartbeat_thread = threading.Thread(target=self._heartbeat_loop, daemon=True)
+        self.heartbeat_thread.start()
+
+    def _heartbeat_loop(self):
+        while True:
+            time.sleep(2)
+            if self.config_manager.role == "primary":
+                with self.storage._lock:
+                    commit_id = self.storage.commit_id
+                    term_id = self.storage.term_id
+                
+                req = kvstore_pb2.HeartbeatRequest(
+                    term_id=term_id,
+                    commit_id=commit_id,
+                    leader_port=self.config_manager.my_port
+                )
+                
+                with self.config_manager.lock:
+                    stubs = list(self.config_manager.follower_stubs)
+                    
+                for stub in stubs:
+                    try:
+                        stub.Heartbeat(req, timeout=1)
+                    except grpc.RpcError:
+                        pass # Follower might be offline or busy
 
     def Put(self, request, context):
         is_leader = (self.config_manager.role == "primary")
@@ -185,6 +210,34 @@ class KeyValueStoreServicer(kvstore_pb2_grpc.KeyValueStoreServicer):
                 term_id=e.get("term_id", 1)
             ))
         return kvstore_pb2.SyncResponse(entries=pb_entries)
+
+    def Heartbeat(self, request, context):
+        with self.storage._lock:
+            local_commit = self.storage.commit_id
+            
+        if request.commit_id > local_commit:
+            threading.Thread(target=self._trigger_sync, args=(local_commit,), daemon=True).start()
+            
+        return kvstore_pb2.HeartbeatResponse(success=True)
+
+    def _trigger_sync(self, local_commit):
+        with self.config_manager.lock:
+            leader_stub = self.config_manager.leader_stub
+            
+        if leader_stub:
+            logging.info(f"Heartbeat: Log is outdated! Syncing from leader starting from commit {local_commit}...")
+            try:
+                req = kvstore_pb2.SyncRequest(from_commit_id=local_commit)
+                resp = leader_stub.SyncLogs(req)
+                for entry in resp.entries:
+                    if entry.op == "put":
+                        self.storage.put_with_ids(entry.key, entry.value, entry.commit_id, entry.term_id)
+                    elif entry.op == "delete":
+                        self.storage.delete_with_ids(entry.key, entry.commit_id, entry.term_id)
+                if resp.entries:
+                    logging.info(f"Successfully caught up {len(resp.entries)} missing logs from leader.")
+            except Exception as e:
+                logging.error(f"Failed to sync logs from leader during heartbeat catch-up: {e}")
 
 def run_server():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

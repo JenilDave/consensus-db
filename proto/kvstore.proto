@@ -7,6 +7,7 @@ service KeyValueStore {
     rpc Get(GetRequest) returns (GetResponse) {}
     rpc Delete(DeleteRequest) returns (DeleteResponse) {}
     rpc SyncLogs(SyncRequest) returns (SyncResponse) {}
+    rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse) {}
 }
 
 message PutRequest {
@@ -55,4 +56,14 @@ message SyncEntry {
 
 message SyncResponse {
     repeated SyncEntry entries = 1;
+}
+
+message HeartbeatRequest {
+    int64 term_id = 1;
+    int64 commit_id = 2;
+    int32 leader_port = 3;
+}
+
+message HeartbeatResponse {
+    bool success = 1;
 }
