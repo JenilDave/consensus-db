@@ -6,7 +6,7 @@ from src.storage.base import BaseStorage
 
 class DurableStorage(BaseStorage):
     def __init__(self, port: int):
-        self.filename = f"data_{port}.jsonl"
+        self.filename = f"db_data/data_{port}.jsonl"
         self._store = {}
         self._lock = threading.Lock()
         self.term_id = 1
