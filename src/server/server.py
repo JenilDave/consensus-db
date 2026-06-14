@@ -115,8 +115,6 @@ class KeyValueStoreServicer(kvstore_pb2_grpc.KeyValueStoreServicer):
                 commit_id = self.storage.commit_id
                 term_id = self.storage.term_id
             
-            success = self.storage.put_with_ids(request.key, request.value, commit_id, term_id)
-            
             repl_request = kvstore_pb2.PutRequest(
                 key=request.key, 
                 value=request.value, 
@@ -124,16 +122,35 @@ class KeyValueStoreServicer(kvstore_pb2_grpc.KeyValueStoreServicer):
                 term_id=term_id
             )
             
-            if success:
-                with self.config_manager.lock:
-                    stubs = list(self.config_manager.follower_stubs)
-                    
-                for stub in stubs:
+            with self.config_manager.lock:
+                stubs = list(self.config_manager.follower_stubs)
+                total_nodes = len(stubs) + 1
+                
+            quorum_needed = (total_nodes // 2) + 1
+            acks = 1 # Leader assumes it will commit if quorum is met
+            
+            if stubs:
+                import concurrent.futures
+                def send_put(stub):
                     try:
-                        stub.Put(repl_request)
-                    except grpc.RpcError as e:
-                        logging.error(f"Failed to replicate Put to follower: {e}")
-            return kvstore_pb2.PutResponse(success=success, message="Value stored successfully.")
+                        resp = stub.Put(repl_request, timeout=2)
+                        return resp.success
+                    except grpc.RpcError:
+                        return False
+                        
+                with concurrent.futures.ThreadPoolExecutor(max_workers=len(stubs)) as executor:
+                    results = executor.map(send_put, stubs)
+                    for res in results:
+                        if res:
+                            acks += 1
+                            
+            if acks >= quorum_needed:
+                success = self.storage.put_with_ids(request.key, request.value, commit_id, term_id)
+                return kvstore_pb2.PutResponse(success=success, message="Value stored successfully via quorum.")
+            else:
+                with self.storage._lock:
+                    self.storage.commit_id -= 1
+                return kvstore_pb2.PutResponse(success=False, message="Failed to reach quorum. Write aborted.")
         else:
             if request.commit_id == 0:
                 with self.config_manager.lock:
@@ -165,24 +182,44 @@ class KeyValueStoreServicer(kvstore_pb2_grpc.KeyValueStoreServicer):
                 commit_id = self.storage.commit_id
                 term_id = self.storage.term_id
                 
-            success = self.storage.delete_with_ids(request.key, commit_id, term_id)
-            
             repl_request = kvstore_pb2.DeleteRequest(
                 key=request.key,
                 commit_id=commit_id,
                 term_id=term_id
             )
             
-            if success:
-                with self.config_manager.lock:
-                    stubs = list(self.config_manager.follower_stubs)
-                    
-                for stub in stubs:
+            with self.config_manager.lock:
+                stubs = list(self.config_manager.follower_stubs)
+                total_nodes = len(stubs) + 1
+                
+            quorum_needed = (total_nodes // 2) + 1
+            acks = 1
+            
+            if stubs:
+                import concurrent.futures
+                def send_delete(stub):
                     try:
-                        stub.Delete(repl_request)
-                    except grpc.RpcError as e:
-                        logging.error(f"Failed to replicate Delete to follower: {e}")
-            return kvstore_pb2.DeleteResponse(success=success, message="Key deleted successfully.")
+                        resp = stub.Delete(repl_request, timeout=2)
+                        return resp.success
+                    except grpc.RpcError:
+                        return False
+
+                with concurrent.futures.ThreadPoolExecutor(max_workers=len(stubs)) as executor:
+                    results = executor.map(send_delete, stubs)
+                    for res in results:
+                        if res:
+                            acks += 1
+                            
+            if acks >= quorum_needed:
+                success = self.storage.delete_with_ids(request.key, commit_id, term_id)
+                if success:
+                    return kvstore_pb2.DeleteResponse(success=True, message="Key deleted successfully via quorum.")
+                else:
+                    return kvstore_pb2.DeleteResponse(success=False, message="Key not found.")
+            else:
+                with self.storage._lock:
+                    self.storage.commit_id -= 1
+                return kvstore_pb2.DeleteResponse(success=False, message="Failed to reach quorum. Delete aborted.")
         else:
             if request.commit_id == 0:
                 with self.config_manager.lock:
