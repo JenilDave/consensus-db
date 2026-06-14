@@ -49,6 +49,11 @@ class KeyValueStoreStub:
                 request_serializer=kvstore__pb2.DeleteRequest.SerializeToString,
                 response_deserializer=kvstore__pb2.DeleteResponse.FromString,
                 _registered_method=True)
+        self.SyncLogs = channel.unary_unary(
+                '/kvstore.KeyValueStore/SyncLogs',
+                request_serializer=kvstore__pb2.SyncRequest.SerializeToString,
+                response_deserializer=kvstore__pb2.SyncResponse.FromString,
+                _registered_method=True)
 
 
 class KeyValueStoreServicer:
@@ -72,6 +77,12 @@ class KeyValueStoreServicer:
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SyncLogs(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_KeyValueStoreServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -89,6 +100,11 @@ def add_KeyValueStoreServicer_to_server(servicer, server):
                     servicer.Delete,
                     request_deserializer=kvstore__pb2.DeleteRequest.FromString,
                     response_serializer=kvstore__pb2.DeleteResponse.SerializeToString,
+            ),
+            'SyncLogs': grpc.unary_unary_rpc_method_handler(
+                    servicer.SyncLogs,
+                    request_deserializer=kvstore__pb2.SyncRequest.FromString,
+                    response_serializer=kvstore__pb2.SyncResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -172,6 +188,33 @@ class KeyValueStore:
             '/kvstore.KeyValueStore/Delete',
             kvstore__pb2.DeleteRequest.SerializeToString,
             kvstore__pb2.DeleteResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SyncLogs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/kvstore.KeyValueStore/SyncLogs',
+            kvstore__pb2.SyncRequest.SerializeToString,
+            kvstore__pb2.SyncResponse.FromString,
             options,
             channel_credentials,
             insecure,

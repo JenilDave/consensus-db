@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rkvstore.proto\x12\x07kvstore\"(\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\"/\n\x0bPutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x19\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"+\n\x0bGetResponse\x12\r\n\x05\x66ound\x18\x01 \x01(\x08\x12\r\n\x05value\x18\x02 \x01(\t\"\x1c\n\rDeleteRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"2\n\x0e\x44\x65leteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2\xb4\x01\n\rKeyValueStore\x12\x32\n\x03Put\x12\x13.kvstore.PutRequest\x1a\x14.kvstore.PutResponse\"\x00\x12\x32\n\x03Get\x12\x13.kvstore.GetRequest\x1a\x14.kvstore.GetResponse\"\x00\x12;\n\x06\x44\x65lete\x12\x16.kvstore.DeleteRequest\x1a\x17.kvstore.DeleteResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rkvstore.proto\x12\x07kvstore\"L\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\tcommit_id\x18\x03 \x01(\x03\x12\x0f\n\x07term_id\x18\x04 \x01(\x03\"/\n\x0bPutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x19\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"+\n\x0bGetResponse\x12\r\n\x05\x66ound\x18\x01 \x01(\x08\x12\r\n\x05value\x18\x02 \x01(\t\"@\n\rDeleteRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x11\n\tcommit_id\x18\x02 \x01(\x03\x12\x0f\n\x07term_id\x18\x03 \x01(\x03\"2\n\x0e\x44\x65leteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"%\n\x0bSyncRequest\x12\x16\n\x0e\x66rom_commit_id\x18\x01 \x01(\x03\"W\n\tSyncEntry\x12\n\n\x02op\x18\x01 \x01(\t\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\x12\x11\n\tcommit_id\x18\x04 \x01(\x03\x12\x0f\n\x07term_id\x18\x05 \x01(\x03\"3\n\x0cSyncResponse\x12#\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x12.kvstore.SyncEntry2\xef\x01\n\rKeyValueStore\x12\x32\n\x03Put\x12\x13.kvstore.PutRequest\x1a\x14.kvstore.PutResponse\"\x00\x12\x32\n\x03Get\x12\x13.kvstore.GetRequest\x1a\x14.kvstore.GetResponse\"\x00\x12;\n\x06\x44\x65lete\x12\x16.kvstore.DeleteRequest\x1a\x17.kvstore.DeleteResponse\"\x00\x12\x39\n\x08SyncLogs\x12\x14.kvstore.SyncRequest\x1a\x15.kvstore.SyncResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,17 +32,23 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'kvstore_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_PUTREQUEST']._serialized_start=26
-  _globals['_PUTREQUEST']._serialized_end=66
-  _globals['_PUTRESPONSE']._serialized_start=68
-  _globals['_PUTRESPONSE']._serialized_end=115
-  _globals['_GETREQUEST']._serialized_start=117
-  _globals['_GETREQUEST']._serialized_end=142
-  _globals['_GETRESPONSE']._serialized_start=144
-  _globals['_GETRESPONSE']._serialized_end=187
-  _globals['_DELETEREQUEST']._serialized_start=189
-  _globals['_DELETEREQUEST']._serialized_end=217
-  _globals['_DELETERESPONSE']._serialized_start=219
-  _globals['_DELETERESPONSE']._serialized_end=269
-  _globals['_KEYVALUESTORE']._serialized_start=272
-  _globals['_KEYVALUESTORE']._serialized_end=452
+  _globals['_PUTREQUEST']._serialized_end=102
+  _globals['_PUTRESPONSE']._serialized_start=104
+  _globals['_PUTRESPONSE']._serialized_end=151
+  _globals['_GETREQUEST']._serialized_start=153
+  _globals['_GETREQUEST']._serialized_end=178
+  _globals['_GETRESPONSE']._serialized_start=180
+  _globals['_GETRESPONSE']._serialized_end=223
+  _globals['_DELETEREQUEST']._serialized_start=225
+  _globals['_DELETEREQUEST']._serialized_end=289
+  _globals['_DELETERESPONSE']._serialized_start=291
+  _globals['_DELETERESPONSE']._serialized_end=341
+  _globals['_SYNCREQUEST']._serialized_start=343
+  _globals['_SYNCREQUEST']._serialized_end=380
+  _globals['_SYNCENTRY']._serialized_start=382
+  _globals['_SYNCENTRY']._serialized_end=469
+  _globals['_SYNCRESPONSE']._serialized_start=471
+  _globals['_SYNCRESPONSE']._serialized_end=522
+  _globals['_KEYVALUESTORE']._serialized_start=525
+  _globals['_KEYVALUESTORE']._serialized_end=764
 # @@protoc_insertion_point(module_scope)

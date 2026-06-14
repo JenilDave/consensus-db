@@ -11,7 +11,7 @@ import kvstore_pb2
 import kvstore_pb2_grpc
 
 class KeyValueClient:
-    def __init__(self, host: str = 'localhost', port: int = 50051):
+    def __init__(self, host: str = 'localhost', port: int = 50052):
         self.channel = grpc.insecure_channel(f'{host}:{port}')
         self.stub = kvstore_pb2_grpc.KeyValueStoreStub(self.channel)
 
@@ -39,20 +39,20 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     client = KeyValueClient()
     
-    print("Putting 'name' = 'consensus-db'")
-    success = client.put("name", "consensus-db")
+    print("Putting 'name3' = 'db'")
+    success = client.put("name3", "db")
     print(f"Put success: {success}")
     
-    print("\nGetting 'name'")
-    value = client.get("name")
+    print("\nGetting 'name3'")
+    value = client.get("name3")
     print(f"Got value: {value}")
     
-    print("\nDeleting 'name'")
-    success = client.delete("name")
+    print("\nDeleting 'name3'")
+    success = client.delete("name3")
     print(f"Delete success: {success}")
     
-    print("\nGetting 'name' again")
-    value = client.get("name")
+    print("\nGetting 'name3' again")
+    value = client.get("name3")
     print(f"Got value: {value}")
 
     client.close()
