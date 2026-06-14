@@ -7,7 +7,10 @@ A modular, gRPC-based Key-Value Store built in Python. Features dynamic cluster 
 - **Dynamic Port Binding**: Nodes auto-discover their identity on startup based on available ports defined in a single configuration file.
 - **Hot-Reloading Configuration**: Update the cluster topology (like electing a new leader) during runtime. The servers detect the change instantly without needing a restart.
 - **Replication**: The leader node automatically forwards `Put` and `Delete` requests to all follower nodes.
-- **Modular Storage**: Easily swap the default in-memory dictionary backend for disk-persistence or caching engines.
+- **Write Forwarding**: Clients can send write requests to any follower node, which will transparently proxy them to the leader to ensure single-source-of-truth ordering.
+- **Durability (Write-Ahead Log)**: Operations are durably persisted to a local `.jsonl` file per node. If a node crashes, it perfectly rebuilds its dictionary state and commit ID upon restart.
+- **Automatic Failure Recovery (SyncLogs RPC)**: When a node boots up, it reads its local WAL and then automatically queries the leader for any logs it missed while offline, bringing itself instantly up to speed before accepting client requests.
+- **Client Auto-Discovery**: The client integration script automatically parses `cluster.json` to route directly to the active leader port without hardcoding.
 
 ## Prerequisites
 - [uv](https://docs.astral.sh/uv/) (Python packaging and project manager)
@@ -57,4 +60,10 @@ Once a leader is elected, you can run the integration test client to verify `Put
 ```powershell
 uv run python src/client/client.py
 ```
-*(Note: The default client script connects to port 50051).*
+*(Note: The client will automatically discover the leader by reading `cluster.json`!)*
+
+### 4. Test Failure Recovery
+1. Run each node in its own terminal using `uv run python src/server/server.py`.
+2. Kill one of the follower terminals (`Ctrl+C`).
+3. Run the client script to create new data on the leader.
+4. Restart the dead follower terminal. Watch it automatically rebuild its historical state from its `data_{port}.jsonl` file and trigger a `SyncLogs` RPC to fetch the missing writes from the leader!
