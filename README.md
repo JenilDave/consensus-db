@@ -8,6 +8,8 @@ A modular, gRPC-based Key-Value Store built in Python. Features dynamic cluster 
 - **Hot-Reloading Configuration**: Update the cluster topology (like electing a new leader) during runtime. The servers detect the change instantly without needing a restart.
 - **Replication**: The leader node automatically forwards `Put` and `Delete` requests to all follower nodes.
 - **Write Forwarding**: Clients can send write requests to any follower node, which will transparently proxy them to the leader to ensure single-source-of-truth ordering.
+- **Leader Heartbeats**: The leader broadcasts background heartbeat RPCs to all followers every 2 seconds to announce its presence and its latest commit index.
+- **Quorum Consensus**: The leader utilizes a two-phase-like approach for writes. It broadcasts the write to followers in parallel and will only commit the transaction locally if it receives successful acknowledgments from a majority (>50%) of the cluster. If quorum is not met, the write is aborted.
 - **Durability (Write-Ahead Log)**: Operations are durably persisted to a local `.jsonl` file per node. If a node crashes, it perfectly rebuilds its dictionary state and commit ID upon restart.
 - **Automatic Failure Recovery (SyncLogs RPC)**: When a node boots up, it reads its local WAL and then automatically queries the leader for any logs it missed while offline, bringing itself instantly up to speed before accepting client requests.
 - **Client Auto-Discovery**: The client integration script automatically parses `cluster.json` to route directly to the active leader port without hardcoding.
